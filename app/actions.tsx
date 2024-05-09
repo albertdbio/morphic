@@ -20,6 +20,7 @@ import { BotMessage } from '@/components/message'
 import { SearchSection } from '@/components/search-section'
 import SearchRelated from '@/components/search-related'
 import { CopilotDisplay } from '@/components/copilot-display'
+import { formatToolMessages } from '@/lib/utils'
 
 async function submit(formData?: FormData, skip?: boolean) {
   'use server'
@@ -188,6 +189,13 @@ async function submit(formData?: FormData, skip?: boolean) {
       // Wait for 0.5 second before adding the answer to the state
       await new Promise(resolve => setTimeout(resolve, 500))
 
+      // const formattedToolMessages = formatToolMessages(messages)
+      // aiState.done([
+      //   ...aiState.get(),
+      //   ...formattedToolMessages,
+      //   { role: 'assistant', content: answer }
+      // ])
+
       aiState.done({
         ...aiState.get(),
         messages: [
@@ -254,7 +262,7 @@ export const AI = createAI<AIState, UIState>({
   },
   initialUIState,
   initialAIState,
-  unstable_onGetUIState: async () => {
+  onGetUIState: async () => {
     'use server'
 
     const aiState = getAIState()
@@ -265,7 +273,7 @@ export const AI = createAI<AIState, UIState>({
       return
     }
   },
-  unstable_onSetAIState: async ({ state, done }) => {
+  onSetAIState: async ({ state, done }) => {
     'use server'
 
     // Check if there is any message of type 'answer' in the state messages
